@@ -74,6 +74,11 @@
       cursor: pointer;
     }
 
+    .previewImg {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
 
   </style>
 </head>
@@ -176,7 +181,6 @@
       }
 
       function tx_handler() {
-
         var topFile = this.files[0];
         if(topFile){
           // 绘制矩形路径
@@ -259,6 +263,14 @@
           alink.href = convertCanvasToImage(canvas).src;
           alink.download = na.value ? na.value + ".jpg" : Date.now() + ".jpg";
           alink.click();
+
+          // 生成预览图
+          var img = new Image();
+          img.src = convertCanvasToImage(canvas).src;
+          img.className = 'previewImg';
+          img.onload = function(){
+            document.body.appendChild(this);
+          }
       }
     }
 
