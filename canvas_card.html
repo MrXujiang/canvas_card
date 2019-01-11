@@ -100,7 +100,7 @@
     // 初始化canvas大小
 
     canvas.width = winW;
-    canvas.height = winH;
+    canvas.height = winH*1.1;
 
     if(canvas.getContext){
       var ctx = canvas.getContext('2d');
@@ -155,15 +155,6 @@
       // 头像上传
       tx.addEventListener('change', tx_handler, false)
 
-      // 姓名
-      // na.addEventListener('blur', name_handler, false)
-      //
-      // 职位
-      // job.addEventListener('blur', job_handler, false)
-      //
-      // 公司
-      // cp.addEventListener('blur', cp_handler, false)
-
       // 生成海报
       cut.addEventListener('click', generatorImg, false)
 
@@ -217,33 +208,57 @@
         }
       }
 
-
       function name_handler() {
+        ctx.save();
         ctx.fillStyle = EleSizeRule.name.color;
         ctx.font = EleSizeRule.name.fontSize +"px Helvetica";
         ctx.textBaseline = "hanging";
         ctx.textAlign = "center";
         ctx.fillText(na.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top);
         na.style.opacity = '0';
+        ctx.restore();
       }
 
       function job_handler() {
+        ctx.save();
         ctx.fillStyle = EleSizeRule.job.color;
         ctx.font = EleSizeRule.job.fontSize +"px Helvetica";
         ctx.textBaseline = "hanging";
         ctx.textAlign = "center";
         ctx.fillText(job.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top+EleSizeRule.job.top);
         job.style.opacity = '0';
+        ctx.restore();
       }
 
       function cp_handler() {
+        ctx.save();
         ctx.fillStyle = EleSizeRule.cp.color;
         ctx.font = EleSizeRule.cp.fontSize +"px Helvetica";
         ctx.textBaseline = "hanging";
         ctx.textAlign = "center";
         ctx.fillText(cp.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top+EleSizeRule.job.top+EleSizeRule.cp.top);
         cp.style.opacity = '0';
+        ctx.restore();
       }
+
+      function drawCode(cb) {
+        var img = new Image();
+        img.src = EleSizeRule.codeURL;
+        img.onload = function(){
+          var w = img.width,
+              h = img.height;
+          ctx.drawImage(
+            img,
+            (winW-w*0.6)/2,
+            EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top+EleSizeRule.job.top+EleSizeRule.cp.top+40,
+            w*0.6,
+            h*0.6
+          );
+          // 执行回调
+          cb && cb();
+        }
+      }
+
 
       // 将canvas转化为图片
       function convertCanvasToImage(canvas) {
@@ -259,18 +274,21 @@
           job_handler();
           cp_handler();
 
-          var alink = document.createElement("a");
-          alink.href = convertCanvasToImage(canvas).src;
-          alink.download = na.value ? na.value + ".jpg" : Date.now() + ".jpg";
-          alink.click();
+          // 绘制二维码
+          drawCode(function(){
+            var alink = document.createElement("a");
+            alink.href = convertCanvasToImage(canvas).src;
+            alink.download = na.value ? na.value + ".jpg" : Date.now() + ".jpg";
+            alink.click();
 
-          // 生成预览图
-          var img = new Image();
-          img.src = convertCanvasToImage(canvas).src;
-          img.className = 'previewImg';
-          img.onload = function(){
-            document.body.appendChild(this);
-          }
+            // 生成预览图
+            var img = new Image();
+            img.src = convertCanvasToImage(canvas).src;
+            img.className = 'previewImg';
+            img.onload = function(){
+              document.body.appendChild(this);
+            }
+          });
       }
     }
 

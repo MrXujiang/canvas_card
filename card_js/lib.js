@@ -4,6 +4,7 @@ var winW = window.innerWidth,
 
   EleSizeRule = {
     defaultImgPath: 'img/top_banner.png',
+    codeURL: 'img/code.png',
     bgColor: '#fff',
     topBannerH: winH*0.4,
     txBox: {
@@ -13,17 +14,17 @@ var winW = window.innerWidth,
       dy: 40
     },
     name: {
-      top: 0.1*winH,
+      top: 0.05*winH,
       fontSize: 30,
       color: 'rgb(6, 13, 41)'
     },
     job: {
-      top: 0.1*winH,
-      fontSize: 24,
+      top: 0.06*winH,
+      fontSize: 22,
       color: 'rgb(6, 13, 41)'
     },
     cp: {
-      top: 0.16*winH,
+      top: 0.1*winH,
       fontSize: 16,
       color: '#ccc'
     },
