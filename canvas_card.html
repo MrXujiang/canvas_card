@@ -79,8 +79,8 @@
 </head>
 <body>
   <div class="mask">
-    <input type="file" id="top_banner" accept="image/png,image/jpg,image/jpeg" />
-    <input type="file" id="tx" accept="image/png,image/jpg,image/jpeg" />
+    <input type="file" id="top_banner" accept="image/png,image/jpg,image/jpeg" capture="camera" />
+    <input type="file" id="tx" accept="image/png,image/jpg,image/jpeg" capture="camera" />
     <input type="text" id="name" placeholder="请输入姓名" />
     <input type="text" id="job" placeholder="请输入职位" />
     <input type="text" id="company" placeholder="请输入公司" />
@@ -112,6 +112,14 @@
           job = $('job'),
           cp = $('company'),
           cut = $('generate');
+
+      // 使手机端可以正常调用摄像头，相册
+      var isIOS = /(iphone|ipod|ipad|ios)/i.test(navigator.userAgent),
+          // isAndroid = /android/i.test(navigator.userAgent);
+      if(isIOS){
+        t_banner.removeAttribute('capture');
+        tx.removeAttribute('capture');
+      }
 
       // 默认图片
       defaultImgPath = EleSizeRule.defaultImgPath;
