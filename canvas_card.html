@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    html,body{
+      font-size: 20px;
+      margin: 0;
+      height: 100%;
+    }
+    input {
+      display: block;
+      margin-left: 50vw;
+      transform: translateX(-50%);
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+    #top_banner {
+      width: 100vw;
+      height: 40vh;
+      opacity: 0;
+    }
+
+    #tx {
+      margin-top: -10vw;
+      width: 30vw;
+      height: 30vw;
+      opacity: 0;
+    }
+
+    #name {
+      margin-top: 10vh;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 1.5rem;
+    }
+
+    #job {
+      margin-top:5vh;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 1.2rem;
+    }
+
+    #company {
+      margin-top: 10vh;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: .8rem;
+    }
+
+    .mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      top: 0;
+      left:0;
+    }
+
+    #generate {
+      position: absolute;
+      width: 12vw;
+      height: 12vw;
+      border-radius: 50%;
+      right: 8vw;
+      bottom: 10vh;
+      background-color: rgb(6, 13, 41);
+      text-align: center;
+      line-height: 12vw;
+      color: white;
+      font-size: .6rem;
+      cursor: pointer;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="mask">
+    <input type="file" id="top_banner" accept=".png,.jpg,.jpeg" />
+    <input type="file" id="tx" accept=".png,.jpg,.jpeg" />
+    <input type="text" id="name" placeholder="请输入姓名" />
+    <input type="text" id="job" placeholder="请输入职位" />
+    <input type="text" id="company" placeholder="请输入公司" />
+  </div>
+  <span id="generate">生成</span>
+  <canvas id="bg">当前浏览器不支持canvas,请更新浏览器</canvas>
+  <script src="card_js/lib.js"></script>
+  <script>
+    // canvas
+    var canvas = document.getElementById('bg');
+
+    // 初始化canvas大小
+
+    canvas.width = winW;
+    canvas.height = winH;
+
+    if(canvas.getContext){
+      var ctx = canvas.getContext('2d');
+
+      // 绘制画布背景
+      ctx.fillStyle = EleSizeRule.bgColor || '#fff';
+      ctx.fillRect(0, 0, winW, winH);
+      ctx.fill();
+
+      // dom
+      var t_banner = $('top_banner'),
+          tx = $('tx'),
+          na = $('name'),
+          job = $('job'),
+          cp = $('company'),
+          cut = $('generate');
+
+      // 默认图片
+      defaultImgPath = EleSizeRule.defaultImgPath;
+
+      // 绘制顶部默认图像
+      img = new Image();
+      img.src = defaultImgPath;
+      img.onload = function(){
+        ctx.drawImage(img,0,0, winW, EleSizeRule.topBannerH);
+
+        // 绘制头像矩形框
+        roundedRect({
+          ctx: ctx,
+          x: (winW-EleSizeRule.txBox.w)/2,
+          y: EleSizeRule.topBannerH-EleSizeRule.txBox.dy,
+          w: EleSizeRule.txBox.w,
+          h: EleSizeRule.txBox.h,
+          r: EleSizeRule.txBox.radius,
+          type: 'shape',
+          fill: '#fff'
+        })
+      }
+
+
+      // 顶部banner上传事件监听
+      t_banner.addEventListener('change', top_handler, false)
+
+      // 头像上传
+      tx.addEventListener('change', tx_handler, false)
+
+      // 姓名
+      // na.addEventListener('blur', name_handler, false)
+      //
+      // 职位
+      // job.addEventListener('blur', job_handler, false)
+      //
+      // 公司
+      // cp.addEventListener('blur', cp_handler, false)
+
+      // 生成海报
+      cut.addEventListener('click', generatorImg, false)
+
+      function top_handler() {
+        var topFile = this.files[0];
+        if(topFile){
+          ctx.clearRect(0, 0, winW, EleSizeRule.topBannerH);
+          var img = new Image();
+          img.src = window.URL.createObjectURL(topFile);
+          img.onload = function(){
+            window.URL.revokeObjectURL(this.src);
+            ctx.drawImage(img, 0, 0, winW, EleSizeRule.topBannerH);
+          }
+        }
+      }
+
+      function tx_handler() {
+
+        var topFile = this.files[0];
+        if(topFile){
+          // 绘制矩形路径
+          roundedRect({
+            ctx: ctx,
+            x: (winW-EleSizeRule.txBox.w)/2,
+            y: EleSizeRule.topBannerH-EleSizeRule.txBox.dy,
+            w: EleSizeRule.txBox.w,
+            h: EleSizeRule.txBox.h,
+            r: EleSizeRule.txBox.radius,
+            type: 'clip'
+          });
+
+          ctx.clearRect(
+            (winW-EleSizeRule.txBox.w)/2,
+            EleSizeRule.topBannerH-EleSizeRule.txBox.dy,
+            EleSizeRule.txBox.w,
+            EleSizeRule.txBox.h
+          );
+
+          img = new Image();
+          img.src = window.URL.createObjectURL(topFile);
+          img.onload = function(){
+            window.URL.revokeObjectURL(this.src);
+            ctx.drawImage(
+              img,
+              (winW-EleSizeRule.txBox.w)/2,
+              EleSizeRule.topBannerH-EleSizeRule.txBox.dy,
+              EleSizeRule.txBox.w,
+              EleSizeRule.txBox.h
+            );
+            ctx.restore()
+          }
+        }
+      }
+
+
+      function name_handler() {
+        ctx.fillStyle = EleSizeRule.name.color;
+        ctx.font = EleSizeRule.name.fontSize +"px Helvetica";
+        ctx.textBaseline = "hanging";
+        ctx.textAlign = "center";
+        ctx.fillText(na.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top);
+        na.style.opacity = '0';
+      }
+
+      function job_handler() {
+        ctx.fillStyle = EleSizeRule.job.color;
+        ctx.font = EleSizeRule.job.fontSize +"px Helvetica";
+        ctx.textBaseline = "hanging";
+        ctx.textAlign = "center";
+        ctx.fillText(job.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top+EleSizeRule.job.top);
+        job.style.opacity = '0';
+      }
+
+      function cp_handler() {
+        ctx.fillStyle = EleSizeRule.cp.color;
+        ctx.font = EleSizeRule.cp.fontSize +"px Helvetica";
+        ctx.textBaseline = "hanging";
+        ctx.textAlign = "center";
+        ctx.fillText(cp.value, winW/2, EleSizeRule.topBannerH-EleSizeRule.txBox.dy+EleSizeRule.txBox.h+EleSizeRule.name.top+EleSizeRule.job.top+EleSizeRule.cp.top);
+        cp.style.opacity = '0';
+      }
+
+      // 将canvas转化为图片
+      function convertCanvasToImage(canvas) {
+          var image = new Image();
+          image.src = canvas.toDataURL("image/jpg", EleSizeRule.quality);
+          return image;
+      }
+
+      //生成海报
+      function generatorImg() {
+          // 绘制文字
+          name_handler();
+          job_handler();
+          cp_handler();
+
+          var alink = document.createElement("a");
+          alink.href = convertCanvasToImage(canvas).src;
+          alink.download = na.value ? na.value + ".jpg" : Date.now() + ".jpg";
+          alink.click();
+      }
+    }
+
+  </script>
+</body>
+</html>
