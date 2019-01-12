@@ -138,6 +138,7 @@
                     imgW = Math.ceil(1334 * imgW / imgH);
                     imgH = 1334;
                 }
+
             var canvasTpl = document.createElement("canvas"),
                 ctxTpl = canvas.getContext('2d');
                 canvasTpl.width = imgW;
@@ -182,9 +183,9 @@
                   ctx.drawImage(
                     img,
                     (winW-EleSizeRule.txBox.w)/2,
-                    EleSizeRule.topBannerH-EleSizeRule.txBox.dy,
+                    EleSizeRule.topBannerH-EleSizeRule.txBox.dy+(EleSizeRule.txBox.w-imgH*EleSizeRule.txBox.w/imgW)/2,
                     EleSizeRule.txBox.w,
-                    EleSizeRule.txBox.h
+                    imgH*EleSizeRule.txBox.w/imgW
                   );
                 }
 
